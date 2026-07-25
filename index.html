@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[Your Name] — Numerical Methods for PDEs</title>
+<meta name="description" content="[Your Name] — PhD candidate researching numerical methods for PDEs, coupled multiphysics problems, and computation of time-dependent systems.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14213D;
+    --ink-soft:#2A3A5C;
+    --paper:#F4F6F3;
+    --paper-raised:#FFFFFF;
+    --teal:#1E6E68;
+    --teal-soft:#DCEAE8;
+    --ember:#B5442E;
+    --graphite:#5C6470;
+    --line:rgba(20,33,61,0.12);
+    --line-soft:rgba(20,33,61,0.07);
+    --font-display:'STIX Two Text', 'Georgia', serif;
+    --font-body:'Inter', -apple-system, sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--teal); color:#fff;}
+
+  img{max-width:100%; display:block;}
+  a{color:inherit;}
+
+  h1,h2,h3,h4{
+    font-family:var(--font-display);
+    font-weight:500;
+    margin:0;
+    color:var(--ink);
+  }
+
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    letter-spacing:0.06em;
+    color:var(--teal);
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"§";
+    font-size:14px;
+  }
+  .eyebrow::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+    max-width:120px;
+  }
+
+  /* ---------- Nav ---------- */
+  header.site-nav{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:100;
+    background:rgba(244,246,243,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    transition:background .3s;
+  }
+  header.site-nav.on-hero{
+    background:rgba(20,33,61,0.0);
+    border-bottom-color:rgba(255,255,255,0.14);
+  }
+  .nav-inner{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:16px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .nav-mark{
+    font-family:var(--font-mono);
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:0.03em;
+    color:var(--ink);
+    text-decoration:none;
+  }
+  header.site-nav.on-hero .nav-mark{color:#F4F6F3;}
+  .nav-links{
+    display:flex;
+    gap:28px;
+    list-style:none;
+    margin:0; padding:0;
+  }
+  .nav-links a{
+    font-family:var(--font-mono);
+    font-size:13px;
+    text-decoration:none;
+    color:var(--graphite);
+    letter-spacing:0.02em;
+    padding:4px 2px;
+    border-bottom:1px solid transparent;
+    transition:color .2s, border-color .2s;
+  }
+  header.site-nav.on-hero .nav-links a{color:rgba(244,246,243,0.75);}
+  .nav-links a:hover, .nav-links a.active{
+    color:var(--teal);
+    border-bottom-color:var(--teal);
+  }
+  header.site-nav.on-hero .nav-links a:hover,
+  header.site-nav.on-hero .nav-links a.active{
+    color:#fff;
+    border-bottom-color:#fff;
+  }
+  .nav-toggle{display:none; background:none; border:none; cursor:pointer; padding:6px;}
+  .nav-toggle span{display:block; width:22px; height:2px; background:var(--ink); margin:5px 0; transition:.2s;}
+  header.site-nav.on-hero .nav-toggle span{background:#F4F6F3;}
+
+  @media (max-width:760px){
+    .nav-links{
+      position:fixed;
+      top:57px; left:0; right:0;
+      background:var(--paper-raised);
+      flex-direction:column;
+      gap:0;
+      border-bottom:1px solid var(--line);
+      max-height:0;
+      overflow:hidden;
+      transition:max-height .3s ease;
+    }
+    .nav-links.open{max-height:400px;}
+    .nav-links a{
+      color:var(--ink) !important;
+      padding:14px 28px;
+      border-bottom:1px solid var(--line-soft) !important;
+      width:100%;
+    }
+    .nav-toggle{display:block;}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    background:var(--ink);
+    color:#F4F6F3;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+  }
+  .hero canvas{
+    position:absolute;
+    inset:0;
+    width:100%; height:100%;
+    opacity:0.55;
+    filter:blur(0.4px);
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at 30% 40%, rgba(20,33,61,0.15) 0%, rgba(20,33,61,0.82) 62%, rgba(20,33,61,0.96) 100%);
+    pointer-events:none;
+  }
+  .hero-content{
+    position:relative;
+    z-index:2;
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:120px 28px 80px;
+    width:100%;
+  }
+  .hero-eyebrow{
+    font-family:var(--font-mono);
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:#7FBDB5;
+    margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem, 6vw, 4.4rem);
+    line-height:1.06;
+    color:#F4F6F3;
+    max-width:14ch;
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:#7FBDB5;
+  }
+  .hero .tagline{
+    margin-top:22px;
+    font-size:1.15rem;
+    color:rgba(244,246,243,0.72);
+    max-width:52ch;
+    line-height:1.65;
+  }
+  .research-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:34px;
+  }
+  .research-tags span{
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    padding:8px 14px;
+    border:1px solid rgba(244,246,243,0.28);
+    border-radius:100px;
+    color:rgba(244,246,243,0.85);
+  }
+  .hero-actions{
+    display:flex;
+    gap:16px;
+    margin-top:44px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:var(--font-mono);
+    font-size:13px;
+    letter-spacing:0.02em;
+    text-decoration:none;
+    padding:13px 24px;
+    border-radius:3px;
+    display:inline-block;
+    transition:transform .18s, background .18s, border-color .18s;
+  }
+  .btn-primary{
+    background:#F4F6F3;
+    color:var(--ink);
+  }
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-outline{
+    border:1px solid rgba(244,246,243,0.35);
+    color:#F4F6F3;
+  }
+  .btn-outline:hover{border-color:#fff; transform:translateY(-2px);}
+
+  .scroll-cue{
+    position:absolute;
+    bottom:34px; left:50%;
+    transform:translateX(-50%);
+    z-index:2;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:rgba(244,246,243,0.5);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+  }
+  .scroll-cue .line{width:1px; height:26px; background:rgba(244,246,243,0.4); animation:pulse-line 1.8s ease-in-out infinite;}
+  @keyframes pulse-line{0%,100%{opacity:.3;} 50%{opacity:1;}}
+
+  /* ---------- Sections generic ---------- */
+  section{
+    padding:100px 0;
+    border-bottom:1px solid var(--line);
+  }
+  section:last-of-type{border-bottom:none;}
+  .section-head{
+    margin-bottom:56px;
+    max-width:640px;
+  }
+  .section-head h2{
+    font-size:clamp(1.8rem, 3.4vw, 2.5rem);
+  }
+  .section-head p{
+    margin-top:14px;
+    color:var(--graphite);
+    font-size:1.02rem;
+    line-height:1.65;
+  }
+
+  .reveal{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  /* ---------- Biography ---------- */
+  .bio-grid{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:56px;
+  }
+  @media (max-width:760px){.bio-grid{grid-template-columns:1fr;}}
+
+  .avatar-placeholder{
+    width:180px; height:180px;
+    border:1.5px dashed var(--line);
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--graphite);
+    padding:14px;
+    background:var(--paper-raised);
+  }
+  .bio-text p{margin:0 0 16px; color:var(--ink-soft); font-size:1.02rem;}
+  .bio-text a{color:var(--teal); text-decoration-color:rgba(30,110,104,0.4);}
+
+  .quals{
+    margin-top:44px;
+    border-top:1px solid var(--line);
+  }
+  .qual-item{
+    display:grid;
+    grid-template-columns:100px 1fr;
+    gap:20px;
+    padding:22px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .qual-item .yr{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--teal);
+    padding-top:2px;
+  }
+  .qual-item h4{font-size:1.05rem; font-weight:600; font-family:var(--font-body);}
+  .qual-item .inst{color:var(--graphite); font-size:0.94rem; margin-top:3px;}
+  .qual-item .thesis{color:var(--graphite); font-size:0.9rem; margin-top:6px; font-style:italic;}
+
+  .interest-cards{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+    margin-top:52px;
+  }
+  @media (max-width:760px){.interest-cards{grid-template-columns:1fr;}}
+  .interest-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:26px 22px;
+  }
+  .interest-card svg{width:34px; height:34px; margin-bottom:16px;}
+  .interest-card h4{font-size:1.02rem; font-family:var(--font-body); font-weight:600;}
+  .interest-card p{color:var(--graphite); font-size:0.92rem; margin-top:8px;}
+
+  /* ---------- Teaching ---------- */
+  .teach-row{
+    display:grid;
+    grid-template-columns:110px 1fr 160px;
+    gap:20px;
+    padding:20px 0;
+    border-bottom:1px solid var(--line-soft);
+    align-items:baseline;
+  }
+  @media (max-width:640px){.teach-row{grid-template-columns:1fr;} .teach-row .term{order:-1;}}
+  .teach-row .term{font-family:var(--font-mono); font-size:12.5px; color:var(--teal);}
+  .teach-row h4{font-family:var(--font-body); font-weight:600; font-size:1rem;}
+  .teach-row .role{color:var(--graphite); font-size:0.9rem; margin-top:4px;}
+  .teach-row .inst-tag{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--graphite);
+    text-align:right;
+    align-self:center;
+  }
+  @media (max-width:640px){.teach-row .inst-tag{text-align:left;}}
+
+  /* ---------- Publications ---------- */
+  .pub-group h3{
+    font-family:var(--font-mono);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--graphite);
+    margin:44px 0 18px;
+    font-weight:500;
+  }
+  .pub-group:first-child h3{margin-top:0;}
+  .pub-entry{
+    padding:20px 0;
+    border-bottom:1px solid var(--line-soft);
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:16px;
+    align-items:start;
+  }
+  @media (max-width:640px){.pub-entry{grid-template-columns:1fr;}}
+  .pub-entry .yr-badge{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--ember);
+  }
+  .pub-entry h4{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:1.02rem;
+    line-height:1.4;
+    margin-top:6px;
+  }
+  .pub-entry .authors{color:var(--graphite); font-size:0.9rem; margin-top:6px;}
+  .pub-entry .venue{color:var(--ink-soft); font-size:0.9rem; font-style:italic; margin-top:4px;}
+  .pub-links{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-self:start;
+  }
+  .pub-links a, .pub-links button{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    text-decoration:none;
+    border:1px solid var(--line);
+    padding:7px 12px;
+    border-radius:100px;
+    color:var(--ink-soft);
+    background:transparent;
+    cursor:pointer;
+    transition:border-color .2s, color .2s;
+    white-space:nowrap;
+  }
+  .pub-links a:hover, .pub-links button:hover{border-color:var(--teal); color:var(--teal);}
+  .pub-links button.copied{border-color:var(--teal); color:var(--teal);}
+
+  /* ---------- Conferences / Workshops ---------- */
+  .timeline{
+    position:relative;
+    padding-left:28px;
+    border-left:1px solid var(--line);
+  }
+  .tl-item{
+    position:relative;
+    padding-bottom:36px;
+  }
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-item::before{
+    content:"";
+    position:absolute;
+    left:-33px; top:4px;
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--paper);
+    border:2px solid var(--teal);
+  }
+  .tl-item .date{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--teal);
+  }
+  .tl-item h4{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:1.02rem;
+    margin-top:6px;
+  }
+  .tl-item .locale{color:var(--graphite); font-size:0.9rem; margin-top:4px;}
+  .tl-item .kind{
+    display:inline-block;
+    margin-top:10px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    padding:4px 10px;
+    background:var(--teal-soft);
+    color:var(--teal);
+    border-radius:100px;
+  }
+
+  /* ---------- Contact ---------- */
+  .contact-wrap{
+    background:var(--ink);
+    color:#F4F6F3;
+    border-radius:8px;
+    padding:64px 48px;
+    position:relative;
+    overflow:hidden;
+  }
+  @media (max-width:640px){.contact-wrap{padding:44px 26px;}}
+  .contact-wrap::before{
+    content:"";
+    position:absolute;
+    top:-40%; right:-15%;
+    width:420px; height:420px;
+    background:radial-gradient(circle, rgba(127,189,181,0.16) 0%, transparent 70%);
+  }
+  .contact-wrap h2{color:#F4F6F3; position:relative;}
+  .contact-wrap > p{color:rgba(244,246,243,0.68); max-width:46ch; margin-top:14px; position:relative;}
+  .contact-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-top:40px;
+    position:relative;
+  }
+  .contact-grid a{
+    font-family:var(--font-mono);
+    font-size:13px;
+    text-decoration:none;
+    padding:13px 20px;
+    border:1px solid rgba(244,246,243,0.24);
+    border-radius:3px;
+    color:#F4F6F3;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    transition:border-color .2s, background .2s;
+  }
+  .contact-grid a:hover{border-color:#7FBDB5; background:rgba(127,189,181,0.08);}
+  .contact-grid svg{width:15px; height:15px;}
+
+  .email-line{
+    margin-top:36px;
+    font-family:var(--font-mono);
+    font-size:1.3rem;
+    position:relative;
+  }
+  .email-line a{color:#7FBDB5; text-decoration:none; border-bottom:1px solid rgba(127,189,181,0.4);}
+
+  footer{
+    padding:36px 0 60px;
+    text-align:center;
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--graphite);
+  }
+  footer a{color:var(--teal); text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header class="site-nav on-hero" id="siteNav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-mark">[Y.N.]</a>
+    <nav>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#biography">Biography</a></li>
+        <li><a href="#teaching">Teaching</a></li>
+        <li><a href="#publications">Publications</a></li>
+        <li><a href="#conferences">Conferences</a></li>
+        <li><a href="#workshops">Workshops</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <canvas id="waveCanvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-eyebrow">PhD Candidate · Applied &amp; Computational Mathematics</div>
+    <h1>[Your Full Name],<br><em>solving equations that move.</em></h1>
+    <p class="tagline">
+      I build and analyze numerical methods for partial differential equations, with a focus on
+      coupled multiphysics systems and the accurate, stable computation of time-dependent processes.
+    </p>
+    <div class="research-tags">
+      <span>Numerical Methods for PDEs</span>
+      <span>Coupled Multiphysics Problems</span>
+      <span>Time-Dependent Computation</span>
+    </div>
+    <div class="hero-actions">
+      <a href="#publications" class="btn btn-primary">View publications</a>
+      <a href="cv.pdf" class="btn btn-outline">Download CV</a>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>scroll</span><span class="line"></span></div>
+</section>
+
+<!-- ================= BIOGRAPHY ================= -->
+<section id="biography">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">1 — Biography</div>
+      <h2>About me</h2>
+    </div>
+
+    <div class="bio-grid reveal">
+      <div class="avatar-placeholder">
+        Replace this block with &lt;img src="photo.jpg"&gt;<br><br>recommended: square, ≥600px
+      </div>
+      <div class="bio-text">
+        <p>
+          I am a final-year PhD candidate in the Department of [Department Name] at [University Name],
+          working under the supervision of [Advisor Name]. My research sits at the intersection of
+          numerical analysis and scientific computing, where I develop discretization schemes and
+          solvers for partial differential equations that describe coupled physical processes —
+          for example, fluid–structure interaction, thermo-mechanical coupling, or reaction–diffusion
+          systems evolving in time.
+        </p>
+        <p>
+          My work focuses on three connected questions: how to discretize PDEs so that the resulting
+          schemes remain stable and accurate (<strong>numerical methods for PDEs</strong>); how to
+          couple solvers for different physical fields without sacrificing consistency or efficiency
+          (<strong>coupled multiphysics problems</strong>); and how to march these systems forward in
+          time reliably, especially when timescales differ across components
+          (<strong>computation of time-dependent problems</strong>).
+        </p>
+        <p>
+          Before beginning my PhD, I completed my master's degree in [Field] at [University], and my
+          undergraduate studies in [Field] at [University]. Outside of research, I contribute to
+          [open-source project / teaching initiative / student seminar] — see below for teaching and
+          service details.
+        </p>
+      </div>
+    </div>
+
+    <div class="quals reveal">
+      <div class="qual-item">
+        <div class="yr">2022–<br>present</div>
+        <div>
+          <h4>PhD in Applied Mathematics</h4>
+          <div class="inst">[University Name], [City, Country] — expected [Month Year]</div>
+          <div class="thesis">Thesis: "[Working title of your PhD thesis, e.g. Stable Numerical
+            Schemes for Coupled Time-Dependent Multiphysics Systems]"</div>
+        </div>
+      </div>
+      <div class="qual-item">
+        <div class="yr">2020–2022</div>
+        <div>
+          <h4>MSc in [Applied Mathematics / Computational Science]</h4>
+          <div class="inst">[University Name], [City, Country]</div>
+          <div class="thesis">Thesis: "[Title of MSc thesis]"</div>
+        </div>
+      </div>
+      <div class="qual-item">
+        <div class="yr">2016–2020</div>
+        <div>
+          <h4>BSc in Mathematics</h4>
+          <div class="inst">[University Name], [City, Country]</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="interest-cards reveal">
+      <div class="interest-card">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#1E6E68" stroke-width="1.6">
+          <circle cx="20" cy="20" r="3"/>
+          <circle cx="20" cy="6" r="2.4"/><circle cx="20" cy="34" r="2.4"/>
+          <circle cx="6" cy="20" r="2.4"/><circle cx="34" cy="20" r="2.4"/>
+          <line x1="20" y1="9" x2="20" y2="17"/><line x1="20" y1="23" x2="20" y2="31"/>
+          <line x1="9" y1="20" x2="17" y2="20"/><line x1="23" y1="20" x2="31" y2="20"/>
+        </svg>
+        <h4>Numerical Methods for PDEs</h4>
+        <p>Finite difference, finite element, and finite volume schemes; stability and
+          convergence analysis for elliptic, parabolic, and hyperbolic problems.</p>
+      </div>
+      <div class="interest-card">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#1E6E68" stroke-width="1.6">
+          <circle cx="14" cy="20" r="9"/>
+          <circle cx="26" cy="20" r="9"/>
+        </svg>
+        <h4>Coupled Multiphysics Problems</h4>
+        <p>Monolithic and partitioned strategies for interacting physical fields — interface
+          conditions, stability of coupling schemes, and iterative solvers.</p>
+      </div>
+      <div class="interest-card">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#1E6E68" stroke-width="1.6">
+          <path d="M6 30 Q13 18 20 24 T34 12"/>
+          <path d="M6 30 Q13 18 20 24 T34 12" stroke-dasharray="2 3" opacity="0.5" transform="translate(0,4)"/>
+          <path d="M30 8 L34 12 L30 16" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h4>Time-Dependent Computation</h4>
+        <p>Time-stepping schemes, adaptive time integration, and error control for
+          long-horizon and multi-timescale simulations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TEACHING ================= -->
+<section id="teaching">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">2 — Teaching</div>
+      <h2>Teaching experience</h2>
+      <p>Courses and sessions I have taught or assisted with during my graduate studies.</p>
+    </div>
+
+    <div class="reveal">
+      <div class="teach-row">
+        <div class="term">Fall 2025</div>
+        <div>
+          <h4>Numerical Analysis I</h4>
+          <div class="role">Teaching Assistant — led weekly problem sessions and computer labs (MATLAB / Python)</div>
+        </div>
+        <div class="inst-tag">[University Name]</div>
+      </div>
+      <div class="teach-row">
+        <div class="term">Spring 2025</div>
+        <div>
+          <h4>Partial Differential Equations</h4>
+          <div class="role">Teaching Assistant — graded coursework, held office hours, delivered two guest lectures</div>
+        </div>
+        <div class="inst-tag">[University Name]</div>
+      </div>
+      <div class="teach-row">
+        <div class="term">Fall 2023</div>
+        <div>
+          <h4>Scientific Computing</h4>
+          <div class="role">Lab Instructor — designed and supervised computational lab exercises</div>
+        </div>
+        <div class="inst-tag">[University Name]</div>
+      </div>
+      <div class="teach-row">
+        <div class="term">2023</div>
+        <div>
+          <h4>Undergraduate Research Mentoring</h4>
+          <div class="role">Supervised [number] undergraduate students on short research projects in numerical PDEs</div>
+        </div>
+        <div class="inst-tag">[University Name]</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PUBLICATIONS ================= -->
+<section id="publications">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">3 — Publications</div>
+      <h2>Publications</h2>
+      <p>Journal articles, conference papers, and preprints. Click "BibTeX" to copy a citation.</p>
+    </div>
+
+    <div class="reveal">
+      <div class="pub-group">
+        <h3>Journal Articles</h3>
+
+        <div class="pub-entry">
+          <div>
+            <span class="yr-badge">2026</span>
+            <h4>A Stable Time-Stepping Scheme for Coupled Thermo-Mechanical Systems</h4>
+            <div class="authors">[Your Name], [Coauthor Name], [Coauthor Name]</div>
+            <div class="venue">Journal of Computational Physics, vol. [xx], pp. [xx–xx]</div>
+          </div>
+          <div class="pub-links">
+            <a href="#">PDF</a>
+            <a href="#">DOI</a>
+            <button class="bibtex-btn" data-bibtex="@article{yourname2026stable,
+  author  = {Your Name and Coauthor Name and Coauthor Name},
+  title   = {A Stable Time-Stepping Scheme for Coupled Thermo-Mechanical Systems},
+  journal = {Journal of Computational Physics},
+  year    = {2026},
+  volume  = {xx},
+  pages   = {xx--xx}
+}">BibTeX</button>
+          </div>
+        </div>
+
+        <div class="pub-entry">
+          <div>
+            <span class="yr-badge">2025</span>
+            <h4>Error Analysis for a Partitioned Fluid–Structure Interaction Solver</h4>
+            <div class="authors">[Your Name], [Advisor Name]</div>
+            <div class="venue">SIAM Journal on Numerical Analysis, vol. [xx], pp. [xx–xx]</div>
+          </div>
+          <div class="pub-links">
+            <a href="#">PDF</a>
+            <a href="#">DOI</a>
+            <button class="bibtex-btn" data-bibtex="@article{yourname2025error,
+  author  = {Your Name and Advisor Name},
+  title   = {Error Analysis for a Partitioned Fluid--Structure Interaction Solver},
+  journal = {SIAM Journal on Numerical Analysis},
+  year    = {2025},
+  volume  = {xx},
+  pages   = {xx--xx}
+}">BibTeX</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-group">
+        <h3>Conference Papers</h3>
+        <div class="pub-entry">
+          <div>
+            <span class="yr-badge">2024</span>
+            <h4>Adaptive Time Integration for Multi-Timescale Reaction–Diffusion Systems</h4>
+            <div class="authors">[Your Name], [Coauthor Name]</div>
+            <div class="venue">Proceedings of the [Conference Name], [City], [Year]</div>
+          </div>
+          <div class="pub-links">
+            <a href="#">PDF</a>
+            <button class="bibtex-btn" data-bibtex="@inproceedings{yourname2024adaptive,
+  author    = {Your Name and Coauthor Name},
+  title     = {Adaptive Time Integration for Multi-Timescale Reaction--Diffusion Systems},
+  booktitle = {Proceedings of the Conference Name},
+  year      = {2024}
+}">BibTeX</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-group">
+        <h3>Preprints</h3>
+        <div class="pub-entry">
+          <div>
+            <span class="yr-badge">2026</span>
+            <h4>Monolithic vs. Partitioned Coupling for Nonlinear Multiphysics Problems: A Comparative Study</h4>
+            <div class="authors">[Your Name]</div>
+            <div class="venue">arXiv preprint arXiv:xxxx.xxxxx</div>
+          </div>
+          <div class="pub-links">
+            <a href="#">arXiv</a>
+            <button class="bibtex-btn" data-bibtex="@misc{yourname2026monolithic,
+  author = {Your Name},
+  title  = {Monolithic vs. Partitioned Coupling for Nonlinear Multiphysics Problems: A Comparative Study},
+  year   = {2026},
+  eprint = {arXiv:xxxx.xxxxx}
+}">BibTeX</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONFERENCES ================= -->
+<section id="conferences">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">4 — Conferences</div>
+      <h2>Conferences attended</h2>
+      <p>Talks, posters, and participation at academic conferences.</p>
+    </div>
+
+    <div class="timeline reveal">
+      <div class="tl-item">
+        <div class="date">June 2026</div>
+        <h4>[Conference Name], [City, Country]</h4>
+        <div class="locale">Presentation: "[Talk title]"</div>
+        <span class="kind">Contributed Talk</span>
+      </div>
+      <div class="tl-item">
+        <div class="date">October 2025</div>
+        <h4>[Conference Name], [City, Country]</h4>
+        <div class="locale">Presentation: "[Poster title]"</div>
+        <span class="kind">Poster</span>
+      </div>
+      <div class="tl-item">
+        <div class="date">July 2024</div>
+        <h4>[Conference Name], [City, Country]</h4>
+        <div class="locale">Attended sessions on numerical PDEs and scientific computing</div>
+        <span class="kind">Attendee</span>
+      </div>
+      <div class="tl-item">
+        <div class="date">March 2023</div>
+        <h4>[Conference Name], [City, Country]</h4>
+        <div class="locale">Presentation: "[Talk title]"</div>
+        <span class="kind">Contributed Talk</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WORKSHOPS ================= -->
+<section id="workshops">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">5 — Workshops</div>
+      <h2>Workshops &amp; schools</h2>
+      <p>Summer schools, training workshops, and short courses.</p>
+    </div>
+
+    <div class="timeline reveal">
+      <div class="tl-item">
+        <div class="date">August 2025</div>
+        <h4>[Workshop / Summer School Name]</h4>
+        <div class="locale">[Organizing Institution], [City, Country]</div>
+        <span class="kind">Participant</span>
+      </div>
+      <div class="tl-item">
+        <div class="date">January 2025</div>
+        <h4>[Workshop Name]</h4>
+        <div class="locale">[Organizing Institution], [City, Country]</div>
+        <span class="kind">Participant</span>
+      </div>
+      <div class="tl-item">
+        <div class="date">May 2024</div>
+        <h4>[Workshop Name on HPC / Scientific Computing]</h4>
+        <div class="locale">[Organizing Institution], [City, Country]</div>
+        <span class="kind">Participant</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-wrap reveal">
+      <div class="eyebrow" style="color:#7FBDB5;">6 — Contact</div>
+      <h2>Get in touch</h2>
+      <p>I'm happy to talk about numerical methods, multiphysics coupling, collaboration, or
+        postdoctoral opportunities.</p>
+
+      <div class="email-line">
+        <a href="mailto:your.name@university.edu">your.name@university.edu</a>
+      </div>
+
+      <div class="contact-grid">
+        <a href="https://orcid.org/0000-0000-0000-0000" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="1.4"/><text x="12" y="16" font-size="9" text-anchor="middle" fill="currentColor">iD</text></svg>
+          ORCID
+        </a>
+        <a href="https://scholar.google.com" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 10l8-5 8 5-8 5-8-5z"/><path d="M8 12v5c0 1.5 2 3 4 3s4-1.5 4-3v-5"/></svg>
+          Google Scholar
+        </a>
+        <a href="https://github.com/yourusername" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-3.16 19.5c.5.1.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 015 0c1.91-1.3 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0012 2z"/></svg>
+          GitHub
+        </a>
+        <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 11-.02 5 2.5 2.5 0 01.02-5zM3 9h4v12H3V9zm7 0h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C21.9 8.65 23 10.9 23 14.1V21h-4v-6.1c0-1.45-.03-3.3-2.02-3.3-2.02 0-2.33 1.58-2.33 3.2V21h-4V9z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Built with plain HTML/CSS/JS · hosted on <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a> · © <span id="yr"></span> [Your Name]
+  </div>
+</footer>
+
+<script>
+  // ---- Year ----
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // ---- Mobile nav ----
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // ---- Nav appearance on scroll (hero vs paper) ----
+  const nav = document.getElementById('siteNav');
+  const hero = document.getElementById('top');
+  const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      nav.classList.toggle('on-hero', entry.isIntersecting && entry.intersectionRatio > 0.55);
+    });
+  }, { threshold: [0, 0.55, 1] });
+  heroObserver.observe(hero);
+
+  // ---- Active link on scroll ----
+  const sections = document.querySelectorAll('section[id]');
+  const navA = document.querySelectorAll('.nav-links a');
+  const activeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navA.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id));
+      }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  sections.forEach(s => activeObserver.observe(s));
+
+  // ---- Reveal on scroll ----
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // ---- BibTeX copy ----
+  document.querySelectorAll('.bibtex-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.bibtex);
+        const original = btn.textContent;
+        btn.textContent = 'Copied ✓';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1800);
+      } catch (e) {
+        alert(btn.dataset.bibtex);
+      }
+    });
+  });
+
+  // ---- Ambient hero animation: finite-difference wave field ----
+  (function(){
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+    let nx, ny, u, uPrev, uNext, cellW, cellH, W, H;
+    const damping = 0.997;
+    const c2 = 0.20; // Courant-like coefficient
+
+    function resize(){
+      W = canvas.width = hero.offsetWidth;
+      H = canvas.height = hero.offsetHeight;
+      nx = Math.max(40, Math.round(W / 16));
+      ny = Math.max(24, Math.round(H / 16));
+      cellW = W / nx;
+      cellH = H / ny;
+      u = new Float32Array(nx * ny);
+      uPrev = new Float32Array(nx * ny);
+      uNext = new Float32Array(nx * ny);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function idx(x,y){ return y*nx + x; }
+
+    function impulse(){
+      const x = 4 + Math.floor(Math.random() * (nx - 8));
+      const y = 4 + Math.floor(Math.random() * (ny - 8));
+      const amp = 5 + Math.random() * 4;
+      u[idx(x,y)] += amp;
+    }
+    setInterval(impulse, 1900);
+    impulse(); impulse();
+
+    function step(){
+      for (let y = 1; y < ny-1; y++){
+        for (let x = 1; x < nx-1; x++){
+          const i = idx(x,y);
+          const lap = u[idx(x+1,y)] + u[idx(x-1,y)] + u[idx(x,y+1)] + u[idx(x,y-1)] - 4*u[i];
+          uNext[i] = (2*u[i] - uPrev[i] + c2*lap) * damping;
+        }
+      }
+      const tmp = uPrev; uPrev = u; u = uNext; uNext = tmp;
+    }
+
+    function draw(){
+      const img = ctx.createImageData(nx, ny);
+      for (let y = 0; y < ny; y++){
+        for (let x = 0; x < nx; x++){
+          const i = idx(x,y);
+          const v = u[i];
+          const t = Math.max(-1, Math.min(1, v / 6));
+          // map to teal (positive) / deep navy (negative), interpolated
+          let r,g,b;
+          if (t >= 0){
+            r = 20 + t*107;   // 20 -> 127
+            g = 33 + t*156;   // 33 -> 189
+            b = 61 + t*120;   // 61 -> 181
+          } else {
+            const s = -t;
+            r = 20 - s*6; g = 33 - s*10; b = 61 - s*20;
+          }
+          const p = i*4;
+          img.data[p]   = r;
+          img.data[p+1] = g;
+          img.data[p+2] = b;
+          img.data[p+3] = 255;
+        }
+      }
+      // draw small offscreen then scale up
+      if (!draw.off) { draw.off = document.createElement('canvas'); }
+      draw.off.width = nx; draw.off.height = ny;
+      draw.off.getContext('2d').putImageData(img, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.clearRect(0,0,W,H);
+      ctx.drawImage(draw.off, 0, 0, nx, ny, 0, 0, W, H);
+    }
+
+    let last = 0;
+    function loop(ts){
+      if (!last || ts - last > 40){ // ~25fps, keep it calm
+        step();
+        draw();
+        last = ts;
+      }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  })();
+</script>
+
+</body>
+</html>
